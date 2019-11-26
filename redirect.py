@@ -13,7 +13,7 @@ class Task(BaseModel):
 
 app = FastAPI()
 
-ip = os.getenv('privateServerGatewayIP')
+ip = open("env").read().strip()
 print(ip)
 @app.get("/")
 async def root():
