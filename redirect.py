@@ -37,12 +37,12 @@ async def post_task(task: Task):
     requests.post(url = 'http://' + ip +':3000/task', data = data)
 
 @app.get("/task/{id}")
-async def get_task(id: int):
+async def get_task(id: str):
     a = requests.get(url = 'http://' + ip +':3000/task/' + id)
     return a.json()
 
 @app.put("/task/{id}")
-async def put_task(id: int, task: Task):
+async def put_task(id: str, task: Task):
     data = {
         "title": task.title, 
         "description": task.description}
@@ -50,6 +50,6 @@ async def put_task(id: int, task: Task):
     return a.json()
 
 @app.delete("/task/{id}")
-async def delete_task(id: int):
+async def delete_task(id: str):
     a = requests.delete(url = 'http://' + ip +':3000/task/' + id)
     return a.json()
