@@ -1,56 +1,55 @@
 from fastapi import FastAPI
+from enum import Enum
 from pydantic import BaseModel
-app = FastAPI()
+import requests
+import json
+import re
+import os
 
 
 class Task(BaseModel):
     title: str
     description: str
 
-t = Task(**{'title':'titulo', 'description': 'descricao'})
-d = {0: t}
+app = FastAPI()
 
-@app.get("/healthcheck")
-def healthcheck():
-    return 200
+ip = os.getenv('toOhioIP')
+print(ip)
+@app.get("/")
+async def root():
+    return {"msg": "Hello World"}
 
-@app.post("/task")
-async def create_task(task: Task, task_id: int):
-    try:
-        d[task_id] = task
-        return f'Task ->Title: {task.title}, Description: {task.description} foi adicionada na tabela task'
-    except:
-        return f'Não posso inserir {task.title, task.description} na tabela task'
+@app.get("/healthcheck/")
+async def healthcheck():
+    a = requests.get(url = 'http://' + ip +':3000/healthcheck')
+    return a.status_code
 
-@app.get("/task")
+@app.get("/task/")
 async def get_tasks():
-    try:
-        return d
-    except:
-        return f'Não posso inserir {task.title, task.description} na tabela task'
+    a = requests.get(url = 'http://' + ip +':3000/task')
+    return a.json()
 
-@app.get("/items/{task_id}")
-async def read_item(task_id: int):
-    try:
-        return d[task_id]
-    except:
-        return f'Não existe nenhuma task com o id {task_id} na tabela task'
+@app.post("/task/")
+async def post_task(task: Task):
+    data = {
+        "title": task.title, 
+        "description": task.description}
+    requests.post(url = 'http://' + ip +':3000/task', data = data)
 
-@app.delete("/task/{task_id}")
-async def delete_task(task_id: int):
-    try:
-        del d[task_id]
-        return f'Task ->task_id: {task_id} foi removida na tabela task'
-    except:
-        return f'Não posso remover a task com o id: {task_id} na tabela task'
+@app.get("/task/{id}")
+async def get_task(id: int):
+    a = requests.get(url = 'http://' + ip +':3000/task/' + id)
+    return a.json()
 
+@app.put("/task/{id}")
+async def put_task(id: int, task: Task):
+    data = {
+        "title": task.title, 
+        "description": task.description}
+    a = requests.put(url = 'http://' + ip +':3000/task/' + id, data = data)
+    return a.json()
 
-@app.put("/task")
-async def update_task(task: Task):
-    try:
-        d[task_id] = Task(**{'title':task.title, 'description': task.description})
-        return f"Task alterado para: {task} com sucesso"
-    except:
-        return f'Não posso alterar a task para: {task}'
-
-
+@app.delete("/task/{id}")
+async def delete_task(id: int):
+    a = requests.delete(url = 'http://' + ip +':3000/task/' + id)
+    return a.json()

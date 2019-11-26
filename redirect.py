@@ -22,7 +22,7 @@ async def root():
 @app.get("/healthcheck/")
 async def healthcheck():
     a = requests.get(url = 'http://' + ip +':3000/healthcheck')
-    return a.json()
+    return a.status_code
 
 @app.get("/task/")
 async def get_tasks():
@@ -32,8 +32,8 @@ async def get_tasks():
 @app.post("/task/")
 async def post_task(task: Task):
     data = {
-        "firstName": task.title, 
-        "lastName": task.description}
+        "title": task.title, 
+        "description": task.description}
     requests.post(url = 'http://' + ip +':3000/task', data = data)
 
 @app.get("/task/{id}")
@@ -44,8 +44,8 @@ async def get_task(id: int):
 @app.put("/task/{id}")
 async def put_task(id: int, task: Task):
     data = {
-        "firstName": task.title, 
-        "lastName": task.description}
+        "title": task.title, 
+        "description": task.description}
     a = requests.put(url = 'http://' + ip +':3000/task/' + id, data = data)
     return a.json()
 
